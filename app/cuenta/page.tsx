@@ -14,47 +14,47 @@ export default function CuentaPage() {
   return (
     <>
       <main className="min-h-screen pb-24">
-        <div className="max-w-xl mx-auto px-6 pt-8">
+        <div className="max-w-xl mx-auto px-6 pt-10">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-sm transition-colors duration-200 mb-8"
+            className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm font-medium transition-colors duration-200 mb-10"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver al studio
           </Link>
 
           {/* Credits card */}
-          <div className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-6 mb-4">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-semibold text-sm">Balance de creditos</h2>
+          <div className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-7 mb-5">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-white font-bold text-base">Balance de creditos</h2>
               <button
                 onClick={() => setShowModal(true)}
-                className="text-xs text-violet-300/80 hover:text-violet-200 bg-violet-500/8 hover:bg-violet-500/15 border border-violet-500/15 px-3 py-1.5 rounded-lg transition-colors duration-200"
+                className="text-sm text-violet-300/80 hover:text-violet-200 bg-violet-500/8 hover:bg-violet-500/15 border border-violet-500/15 px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
               >
                 + Comprar
               </button>
             </div>
 
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-yellow-500/8 border border-yellow-500/15 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-yellow-400" />
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-yellow-500/8 border border-yellow-500/15 flex items-center justify-center">
+                <Zap className="w-6 h-6 text-yellow-400" />
               </div>
               <div>
-                <div className="text-white text-3xl font-bold tabular-nums">
+                <div className="text-white text-4xl font-bold tabular-nums">
                   {loading ? "--" : formatCredits(credits)}
                 </div>
-                <div className="text-white/30 text-xs">creditos disponibles</div>
+                <div className="text-white/35 text-sm">creditos disponibles</div>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2.5">
               {CREDIT_PACKS.map((pack) => (
-                <div key={pack.id} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 text-center">
-                  <div className="text-white font-semibold text-sm">{pack.credits}</div>
-                  <div className="text-white/25 text-[10px]">creditos</div>
-                  <div className="text-white/45 text-xs font-medium mt-1">${pack.price}</div>
+                <div key={pack.id} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 text-center">
+                  <div className="text-white font-bold text-base">{pack.credits}</div>
+                  <div className="text-white/30 text-xs">creditos</div>
+                  <div className="text-white/50 text-sm font-semibold mt-1.5">${pack.price}</div>
                   {pack.bonus && (
-                    <div className="text-violet-400/60 text-[10px] mt-0.5">{pack.bonus}</div>
+                    <div className="text-violet-400/60 text-xs mt-1">{pack.bonus}</div>
                   )}
                 </div>
               ))}
@@ -62,22 +62,22 @@ export default function CuentaPage() {
           </div>
 
           {/* What you can create */}
-          <div className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-6 mb-4">
-            <h2 className="text-white font-semibold text-sm mb-4">Que puedes crear?</h2>
+          <div className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-7 mb-5">
+            <h2 className="text-white font-bold text-base mb-5">Que puedes crear?</h2>
             <div className="space-y-1">
               {[
                 { icon: ImageIcon, label: "Imagen basica (Dreamina v3)", cost: 4 },
                 { icon: ImageIcon, label: "Imagen premium (DALL-E 3)", cost: 5 },
-                { icon: Film, label: "Video basico (Cinematic)", cost: 10 },
-                { icon: Film, label: "Video pro (Seedance 1.5 Pro)", cost: 32 },
+                { icon: Film, label: "Video basico (Cinematic)", cost: 12 },
+                { icon: Film, label: "Video pro (Seedance 1.5 Pro)", cost: 3 },
               ].map(({ icon: Icon, label, cost }) => (
-                <div key={label} className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
-                  <div className="flex items-center gap-2 text-white/50 text-sm">
-                    <Icon className="w-3.5 h-3.5 text-white/25" />
+                <div key={label} className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
+                  <div className="flex items-center gap-2.5 text-white/55 text-sm">
+                    <Icon className="w-4 h-4 text-white/30" />
                     <span>{label}</span>
                   </div>
-                  <div className="flex items-center gap-0.5 text-yellow-400/70 text-xs font-bold">
-                    <Zap className="w-2.5 h-2.5" /> {cost}
+                  <div className="flex items-center gap-1 text-yellow-400/80 text-sm font-bold">
+                    <Zap className="w-3 h-3" /> {cost}
                   </div>
                 </div>
               ))}
@@ -85,11 +85,11 @@ export default function CuentaPage() {
           </div>
 
           {/* Plan badge */}
-          <div className="flex items-center gap-3 bg-gradient-to-r from-violet-500/[0.06] to-fuchsia-500/[0.06] border border-violet-500/12 rounded-2xl p-4">
-            <Crown className="w-5 h-5 text-violet-400/70 shrink-0" />
+          <div className="flex items-center gap-4 bg-gradient-to-r from-violet-500/[0.06] to-fuchsia-500/[0.06] border border-violet-500/12 rounded-2xl p-5">
+            <Crown className="w-6 h-6 text-violet-400/70 shrink-0" />
             <div>
-              <p className="text-white text-sm font-medium">Plan Beta</p>
-              <p className="text-white/30 text-xs">Acceso anticipado &middot; Precios especiales para miembros de Skool</p>
+              <p className="text-white text-base font-semibold">Plan Beta</p>
+              <p className="text-white/35 text-sm">Acceso anticipado &middot; Precios especiales para miembros de Skool</p>
             </div>
           </div>
         </div>

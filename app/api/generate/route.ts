@@ -22,12 +22,18 @@ export async function POST(req: NextRequest) {
       duration: duration || 5,
     } as Parameters<typeof submitVideoJob>[0];
 
-    // Media input — reference models use videos[], others use image
-    if (inputType === "videos" && image) {
+    // Media input — varies by model family
+    if (inputType === "reference_urls" && image) {
+      // WAN 2.6 Ref Flash expects reference_urls array
+      params.extraParams = params.extraParams || {};
+      params.extraParams.reference_urls = [image];
+    } else if (inputType === "videos" && image) {
+      // WAN 2.6 Reference expects videos array
       params.videos = [image];
     } else if (image) {
-      // Some models use "first_image" instead of "image" (e.g. WAN FLF2V)
+      // Standard image-to-video models
       if (startFrameParam && startFrameParam !== "image") {
+        // WAN FLF2V uses "first_image" instead of "image"
         params.extraParams = params.extraParams || {};
         params.extraParams[startFrameParam] = image;
       } else {
@@ -35,7 +41,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // End frame — for start+end frame models
+    // End frame — for start+end frame models (Kling, WAN FLF2V, Seedance, Veo)
     if (endFrame && endFrameParam) {
       params.extraParams = params.extraParams || {};
       params.extraParams[endFrameParam] = endFrame;

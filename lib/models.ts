@@ -1,6 +1,7 @@
-// ─── Credit costs (1 credit = $0.10) ──────────────────────────────
-// All costs are 2x Wavespeed price → ~50% margin
-// Exception: expensive video models slightly reduced markup
+// ─── Credit costs ──────────────────────────────────────────────────
+// Images: credits = ceil(wavespeedCost × 12.5)  → ~25% margin
+// Videos: credits = ceil(wavespeedCost × 15)    → ~33% margin, min 3cr
+// wavespeedCost = real Wavespeed API price (USD) at 720p, default duration, no audio
 
 export interface RatioOption {
   label: string;    // shown in UI: "16:9", "9:16 HD"
@@ -8,47 +9,44 @@ export interface RatioOption {
 }
 
 export interface ModelConstraints {
-  // Duration
   durationMode: "range" | "discrete" | "none";
   durationRange?: { min: number; max: number };
-  durationOptions?: number[]; // for discrete
+  durationOptions?: number[];
   durationDefault: number;
 
-  // Ratio / size
   ratioParam: "aspect_ratio" | "size" | "none";
   ratios: RatioOption[];
-  ratioDefault: string; // label of default ratio (e.g. "16:9")
+  ratioDefault: string;
 
-  // Media input format expected by the API
-  inputType: "image" | "videos" | "text";
+  inputType: "image" | "videos" | "reference_urls" | "text";
 
   // Start/End frame support
-  supportsEndFrame?: boolean;        // true if model accepts an end frame image
-  endFrameParam?: string;            // API param name: "end_image" (Kling) or "last_image" (WAN/Vidu)
-  startFrameParam?: string;          // API param name if != "image" (e.g. "first_image" for WAN FLF2V)
+  supportsEndFrame?: boolean;
+  endFrameParam?: string;       // "end_image" (Kling) or "last_image" (WAN/Seedance/Veo)
+  startFrameParam?: string;     // "first_image" for WAN FLF2V, omit for "image"
 }
 
 export interface ModelDef {
   id: string;
   name: string;
   provider: string;
-  credits: number;      // cost in credits
-  wavespeedCost: number; // actual USD cost (reference)
+  credits: number;
+  wavespeedCost: number;
   badge?: string;
   description?: string;
-  supportsRef?: boolean; // supports reference image input
+  supportsRef?: boolean;
   supportsEdit?: boolean;
-  constraints?: ModelConstraints; // video models only
+  constraints?: ModelConstraints;
 }
 
 // ─── Shared ratio presets ──────────────────────────────────────────
 const SEEDANCE_RATIOS: RatioOption[] = [
-  { label: "21:9",  apiValue: "21:9" },
   { label: "16:9",  apiValue: "16:9" },
-  { label: "4:3",   apiValue: "4:3" },
-  { label: "1:1",   apiValue: "1:1" },
-  { label: "3:4",   apiValue: "3:4" },
   { label: "9:16",  apiValue: "9:16" },
+  { label: "1:1",   apiValue: "1:1" },
+  { label: "4:3",   apiValue: "4:3" },
+  { label: "3:4",   apiValue: "3:4" },
+  { label: "21:9",  apiValue: "21:9" },
 ];
 
 const STANDARD_RATIOS: RatioOption[] = [
@@ -59,7 +57,6 @@ const STANDARD_RATIOS: RatioOption[] = [
   { label: "3:4",  apiValue: "3:4" },
 ];
 
-// WAN models use pixel dimensions as the "size" parameter
 const WAN_SIZE_RATIOS: RatioOption[] = [
   { label: "16:9",     apiValue: "1280x720" },
   { label: "9:16",     apiValue: "720x1280" },
@@ -67,185 +64,142 @@ const WAN_SIZE_RATIOS: RatioOption[] = [
   { label: "9:16 HD",  apiValue: "1080x1920" },
 ];
 
-// WAN FLF2V uses smaller sizes
 const WAN_FLF_SIZE_RATIOS: RatioOption[] = [
-  { label: "16:9",  apiValue: "1280x720" },
-  { label: "9:16",  apiValue: "720x1280" },
-  { label: "16:9 SD", apiValue: "832x480" },
-  { label: "9:16 SD", apiValue: "480x832" },
+  { label: "16:9",     apiValue: "1280x720" },
+  { label: "9:16",     apiValue: "720x1280" },
+  { label: "16:9 SD",  apiValue: "832x480" },
+  { label: "9:16 SD",  apiValue: "480x832" },
+];
+
+const VEO_RATIOS: RatioOption[] = [
+  { label: "16:9", apiValue: "16:9" },
+  { label: "9:16", apiValue: "9:16" },
 ];
 
 // ─── IMAGE MODELS ─────────────────────────────────────────────────
-// Formula: credits = ceil(wavespeedCost × 12.5) → ~25% margen uniforme
+// Formula: credits = ceil(wavespeedCost × 12.5)
 export const IMAGE_MODELS: ModelDef[] = [
   {
     id: "google/nano-banana-2/text-to-image",
     name: "Nano Banana 2",
     provider: "Google",
-    credits: 1,           // $0.0525 × 12.5 = 0.66 → 1
-    wavespeedCost: 0.0525,
-    badge: "💰 Más barato",
-    description: "Rápido y económico",
-    supportsRef: false,
+    credits: 1,
+    wavespeedCost: 0.05,
+    badge: "Economico",
+    description: "Rapido y economico",
   },
   {
     id: "google/nano-banana-pro/text-to-image",
     name: "Nano Banana Pro",
     provider: "Google",
-    credits: 2,           // $0.105 × 12.5 = 1.31 → 2
+    credits: 2,
     wavespeedCost: 0.105,
     description: "Alta calidad Google",
-    supportsRef: false,
   },
   {
     id: "openai/gpt-image-1.5/text-to-image",
     name: "GPT Image 1.5",
     provider: "OpenAI",
-    credits: 3,           // $0.20 × 12.5 = 2.5 → 3
+    credits: 3,
     wavespeedCost: 0.20,
-    badge: "🤖 OpenAI",
+    badge: "OpenAI",
     description: "Entiende prompts complejos",
-    supportsRef: false,
   },
   {
     id: "bytedance/dreamina-v3.0/text-to-image",
     name: "Dreamina v3",
     provider: "ByteDance",
-    credits: 4,           // $0.27 × 12.5 = 3.375 → 4
+    credits: 4,
     wavespeedCost: 0.27,
-    badge: "⭐ Popular",
-    description: "Gran relación calidad/precio",
-    supportsRef: false,
+    badge: "Popular",
+    description: "Gran relacion calidad/precio",
   },
   {
     id: "bytedance/seedream-v3.1",
     name: "Seedream v3.1",
     provider: "ByteDance",
-    credits: 4,           // $0.27 × 12.5 = 3.375 → 4
+    credits: 4,
     wavespeedCost: 0.27,
-    description: "Fotorrealista, muy detallado",
-    supportsRef: false,
+    description: "Fotorrealista, detallado",
   },
   {
     id: "kwaivgi/kling-image-o3/text-to-image",
     name: "Kling Image O3",
     provider: "Kling",
-    credits: 4,           // $0.28 × 12.5 = 3.5 → 4
+    credits: 4,
     wavespeedCost: 0.28,
-    description: "Excelente coherencia visual",
-    supportsRef: false,
+    description: "Coherencia visual",
   },
   {
     id: "alibaba/wan-2.6/text-to-image",
     name: "WAN 2.6",
     provider: "Alibaba",
-    credits: 4,           // $0.30 × 12.5 = 3.75 → 4
+    credits: 4,
     wavespeedCost: 0.30,
     description: "Consistencia de estilo",
-    supportsRef: false,
   },
   {
     id: "bytedance/seedream-v5.0-lite",
     name: "Seedream v5 Lite",
     provider: "ByteDance",
-    credits: 5,           // $0.35 × 12.5 = 4.375 → 5
+    credits: 5,
     wavespeedCost: 0.35,
-    badge: "✨ Nuevo",
-    description: "La versión más reciente",
-    supportsRef: false,
+    badge: "Nuevo",
+    description: "Ultima version Seedream",
   },
   {
     id: "bytedance/seedream-v4.5",
     name: "Seedream v4.5",
     provider: "ByteDance",
-    credits: 5,           // $0.40 × 12.5 = 5.0 → 5
+    credits: 5,
     wavespeedCost: 0.40,
-    description: "Alta resolución, muy nítido",
-    supportsRef: false,
+    description: "Alta resolucion, nitido",
   },
   {
     id: "openai/dall-e-3",
-    name: "DALL·E 3",
+    name: "DALL-E 3",
     provider: "OpenAI",
-    credits: 5,           // $0.40 × 12.5 = 5.0 → 5
+    credits: 5,
     wavespeedCost: 0.40,
-    badge: "🤖 OpenAI",
-    description: "Interpretación creativa",
-    supportsRef: false,
+    badge: "OpenAI",
+    description: "Interpretacion creativa",
   },
 ];
 
 // ─── VIDEO MODELS ─────────────────────────────────────────────────
-// Formula: credits = ceil(wavespeedCost × 12) → ~20% margen uniforme
+// Formula: credits = ceil(wavespeedCost × 15), min 3
+// Prices: 720p, default duration, no audio
 export const VIDEO_MODELS: ModelDef[] = [
+  // ── Tier 1: Economicos (3-5 cr) ──
   {
-    id: "wavespeed-ai/cinematic-video-generator",
-    name: "Cinematic",
-    provider: "WaveSpeed",
-    credits: 10,          // $0.80 × 12 = 9.6 → 10
-    wavespeedCost: 0.80,
-    badge: "💰 Más barato",
-    description: "Cinematic, rápido y económico",
-    supportsRef: false,
-    constraints: {
-      durationMode: "range",
-      durationRange: { min: 3, max: 10 },
-      durationDefault: 5,
-      ratioParam: "aspect_ratio",
-      ratios: STANDARD_RATIOS,
-      ratioDefault: "16:9",
-      inputType: "text",
-    },
-  },
-  {
-    id: "wavespeed-ai/wan-flf2v",
-    name: "WAN First-Last Frame",
-    provider: "WaveSpeed",
-    credits: 12,          // ~$1.00 × 12 = 12
-    wavespeedCost: 1.00,
-    badge: "🎬 Start+End",
-    description: "Define primer y ultimo frame",
+    id: "bytedance/seedance-v1.5-pro/image-to-video-fast",
+    name: "Seedance 1.5 Fast",
+    provider: "ByteDance",
+    credits: 3,               // $0.10 × 15 = 1.5 → min 3
+    wavespeedCost: 0.10,
+    badge: "Economico",
+    description: "Modo rapido, buena calidad",
     supportsRef: true,
     constraints: {
       durationMode: "range",
-      durationRange: { min: 5, max: 10 },
+      durationRange: { min: 4, max: 12 },
       durationDefault: 5,
-      ratioParam: "size",
-      ratios: WAN_FLF_SIZE_RATIOS,
+      ratioParam: "aspect_ratio",
+      ratios: SEEDANCE_RATIOS,
       ratioDefault: "16:9",
       inputType: "image",
       supportsEndFrame: true,
       endFrameParam: "last_image",
-      startFrameParam: "first_image",
-    },
-  },
-  {
-    id: "alibaba/wan-2.6/reference-to-video-flash",
-    name: "WAN 2.6 Ref Flash",
-    provider: "Alibaba",
-    credits: 15,          // $1.25 × 12 = 15.0 → 15
-    wavespeedCost: 1.25,
-    badge: "⚡ Flash",
-    description: "Consistencia de personaje, velocidad",
-    supportsRef: true,
-    constraints: {
-      durationMode: "discrete",
-      durationOptions: [5, 10],
-      durationDefault: 5,
-      ratioParam: "size",
-      ratios: WAN_SIZE_RATIOS,
-      ratioDefault: "16:9",
-      inputType: "videos",
     },
   },
   {
     id: "alibaba/wan-2.6/image-to-video-flash",
     name: "WAN 2.6 Flash",
     provider: "Alibaba",
-    credits: 15,          // $1.25 × 12 = 15.0 → 15
-    wavespeedCost: 1.25,
-    badge: "⚡ Flash",
-    description: "Imagen a video, muy rápido",
+    credits: 3,               // $0.125 × 15 = 1.875 → min 3
+    wavespeedCost: 0.125,
+    badge: "Flash",
+    description: "Imagen a video, muy rapido",
     supportsRef: true,
     constraints: {
       durationMode: "range",
@@ -258,67 +212,12 @@ export const VIDEO_MODELS: ModelDef[] = [
     },
   },
   {
-    id: "wavespeed-ai/wan-2.2/image-to-video",
-    name: "WAN 2.2",
-    provider: "WaveSpeed",
-    credits: 18,          // $1.50 × 12 = 18.0 → 18
-    wavespeedCost: 1.50,
-    description: "Fluido, buena calidad",
-    supportsRef: true,
-    constraints: {
-      durationMode: "range",
-      durationRange: { min: 2, max: 10 },
-      durationDefault: 5,
-      ratioParam: "aspect_ratio",
-      ratios: STANDARD_RATIOS,
-      ratioDefault: "16:9",
-      inputType: "image",
-    },
-  },
-  {
-    id: "bytedance/seedance-v1.5-pro/image-to-video-fast",
-    name: "Seedance 1.5 Fast",
-    provider: "ByteDance",
-    credits: 24,          // $2.00 × 12 = 24
-    wavespeedCost: 2.00,
-    badge: "⚡ Rápido",
-    description: "Seedance en modo rápido",
-    supportsRef: true,
-    constraints: {
-      durationMode: "range",
-      durationRange: { min: 4, max: 12 },
-      durationDefault: 5,
-      ratioParam: "aspect_ratio",
-      ratios: SEEDANCE_RATIOS,
-      ratioDefault: "16:9",
-      inputType: "image",
-    },
-  },
-  {
-    id: "alibaba/wan-2.5/image-to-video",
-    name: "WAN 2.5",
-    provider: "Alibaba",
-    credits: 30,          // $2.50 × 12 = 30
-    wavespeedCost: 2.50,
-    description: "Alta fidelidad al prompt",
-    supportsRef: true,
-    constraints: {
-      durationMode: "range",
-      durationRange: { min: 2, max: 10 },
-      durationDefault: 5,
-      ratioParam: "size",
-      ratios: WAN_SIZE_RATIOS,
-      ratioDefault: "16:9",
-      inputType: "image",
-    },
-  },
-  {
     id: "bytedance/seedance-v1.5-pro/image-to-video",
     name: "Seedance 1.5 Pro",
     provider: "ByteDance",
-    credits: 32,          // $2.60 × 12 = 31.2 → 32
-    wavespeedCost: 2.60,
-    badge: "⭐ Popular",
+    credits: 3,               // $0.13 × 15 = 1.95 → min 3
+    wavespeedCost: 0.13,
+    badge: "Popular",
     description: "Movimiento natural, gran calidad",
     supportsRef: true,
     constraints: {
@@ -329,15 +228,36 @@ export const VIDEO_MODELS: ModelDef[] = [
       ratios: SEEDANCE_RATIOS,
       ratioDefault: "16:9",
       inputType: "image",
+      supportsEndFrame: true,
+      endFrameParam: "last_image",
+    },
+  },
+  {
+    id: "alibaba/wan-2.6/reference-to-video-flash",
+    name: "WAN 2.6 Ref Flash",
+    provider: "Alibaba",
+    credits: 4,               // $0.25 × 15 = 3.75 → 4
+    wavespeedCost: 0.25,
+    badge: "Personaje",
+    description: "Consistencia de personaje, rapido",
+    supportsRef: true,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [5, 10],
+      durationDefault: 5,
+      ratioParam: "size",
+      ratios: WAN_SIZE_RATIOS,
+      ratioDefault: "16:9",
+      inputType: "reference_urls",
     },
   },
   {
     id: "bytedance/dreamina-v3.0/image-to-video-720p",
     name: "Dreamina v3 720p",
     provider: "ByteDance",
-    credits: 36,          // $3.00 × 12 = 36
-    wavespeedCost: 3.00,
-    description: "720p cinematográfico",
+    credits: 5,               // $0.30 × 15 = 4.5 → 5
+    wavespeedCost: 0.30,
+    description: "720p cinematografico",
     supportsRef: true,
     constraints: {
       durationMode: "discrete",
@@ -349,32 +269,37 @@ export const VIDEO_MODELS: ModelDef[] = [
       inputType: "image",
     },
   },
+  // ── Tier 2: Intermedio (6-9 cr) ──
   {
-    id: "openai/sora-2/image-to-video",
-    name: "Sora 2",
-    provider: "OpenAI",
-    credits: 48,          // $4.00 × 12 = 48
-    wavespeedCost: 4.00,
-    badge: "🤖 OpenAI",
-    description: "Física realista, alta coherencia",
+    id: "wavespeed-ai/wan-flf2v",
+    name: "WAN Start+End Frame",
+    provider: "WaveSpeed",
+    credits: 6,               // $0.40 × 15 = 6.0 → 6
+    wavespeedCost: 0.40,
+    badge: "Start+End",
+    description: "Define primer y ultimo frame",
     supportsRef: true,
     constraints: {
       durationMode: "discrete",
-      durationOptions: [4, 8, 12],
-      durationDefault: 8,
-      ratioParam: "none", // Sora auto-detects from image
-      ratios: [],
-      ratioDefault: "",
+      durationOptions: [5, 10],
+      durationDefault: 5,
+      ratioParam: "size",
+      ratios: WAN_FLF_SIZE_RATIOS,
+      ratioDefault: "16:9",
       inputType: "image",
+      supportsEndFrame: true,
+      endFrameParam: "last_image",
+      startFrameParam: "first_image",
     },
   },
   {
-    id: "kwaivgi/kling-video-o3-std/image-to-video",
-    name: "Kling O3 Standard",
+    id: "kwaivgi/kling-v3.0-std/image-to-video",
+    name: "Kling 3.0 Standard",
     provider: "Kling",
-    credits: 51,          // $4.20 × 12 = 50.4 → 51
-    wavespeedCost: 4.20,
-    description: "Muy buena calidad general",
+    credits: 7,               // $0.42 × 15 = 6.3 → 7
+    wavespeedCost: 0.42,
+    badge: "Nuevo",
+    description: "Ultima version Kling, excelente calidad",
     supportsRef: true,
     constraints: {
       durationMode: "range",
@@ -389,35 +314,36 @@ export const VIDEO_MODELS: ModelDef[] = [
     },
   },
   {
-    id: "alibaba/wan-2.6/reference-to-video",
-    name: "WAN 2.6 Reference",
-    provider: "Alibaba",
-    credits: 60,          // $5.00 × 12 = 60
-    wavespeedCost: 5.00,
-    badge: "🎭 Ref. Personaje",
-    description: "Consistencia de personaje máxima",
+    id: "kwaivgi/kling-video-o3-std/image-to-video",
+    name: "Kling O3 Standard",
+    provider: "Kling",
+    credits: 7,               // $0.42 × 15 = 6.3 → 7
+    wavespeedCost: 0.42,
+    description: "Buena calidad general",
     supportsRef: true,
     constraints: {
-      durationMode: "discrete",
-      durationOptions: [5, 10],
+      durationMode: "range",
+      durationRange: { min: 3, max: 15 },
       durationDefault: 5,
-      ratioParam: "size",
-      ratios: WAN_SIZE_RATIOS,
-      ratioDefault: "16:9",
-      inputType: "videos",
+      ratioParam: "none",
+      ratios: [],
+      ratioDefault: "",
+      inputType: "image",
+      supportsEndFrame: true,
+      endFrameParam: "end_image",
     },
   },
   {
-    id: "alibaba/wan-2.6/image-to-video",
-    name: "WAN 2.6",
+    id: "alibaba/wan-2.5/image-to-video",
+    name: "WAN 2.5",
     provider: "Alibaba",
-    credits: 60,          // $5.00 × 12 = 60
-    wavespeedCost: 5.00,
-    description: "Calidad máxima WAN",
+    credits: 8,               // $0.50 × 15 = 7.5 → 8
+    wavespeedCost: 0.50,
+    description: "Alta fidelidad al prompt",
     supportsRef: true,
     constraints: {
-      durationMode: "discrete",
-      durationOptions: [5, 10],
+      durationMode: "range",
+      durationRange: { min: 3, max: 10 },
       durationDefault: 5,
       ratioParam: "size",
       ratios: WAN_SIZE_RATIOS,
@@ -426,17 +352,55 @@ export const VIDEO_MODELS: ModelDef[] = [
     },
   },
   {
-    id: "kwaivgi/kling-video-o3-pro/image-to-video",
-    name: "Kling O3 Pro",
+    id: "alibaba/wan-2.6/image-to-video",
+    name: "WAN 2.6",
+    provider: "Alibaba",
+    credits: 8,               // $0.50 × 15 = 7.5 → 8
+    wavespeedCost: 0.50,
+    description: "Calidad maxima WAN",
+    supportsRef: true,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [5, 10, 15],
+      durationDefault: 5,
+      ratioParam: "size",
+      ratios: WAN_SIZE_RATIOS,
+      ratioDefault: "16:9",
+      inputType: "image",
+    },
+  },
+  {
+    id: "kwaivgi/kling-v3.0-pro/image-to-video",
+    name: "Kling 3.0 Pro",
     provider: "Kling",
-    credits: 68,          // $5.60 × 12 = 67.2 → 68
-    wavespeedCost: 5.60,
-    badge: "👑 Premium",
-    description: "La mejor calidad Kling",
+    credits: 9,               // $0.56 × 15 = 8.4 → 9
+    wavespeedCost: 0.56,
+    badge: "Premium",
+    description: "Maxima calidad Kling, Start+End frame",
     supportsRef: true,
     constraints: {
       durationMode: "range",
       durationRange: { min: 3, max: 15 },
+      durationDefault: 5,
+      ratioParam: "none",
+      ratios: [],
+      ratioDefault: "",
+      inputType: "image",
+      supportsEndFrame: true,
+      endFrameParam: "end_image",
+    },
+  },
+  {
+    id: "kwaivgi/kling-video-o3-pro/image-to-video",
+    name: "Kling O3 Pro",
+    provider: "Kling",
+    credits: 9,               // $0.56 × 15 = 8.4 → 9
+    wavespeedCost: 0.56,
+    description: "Alta calidad Kling con Start+End",
+    supportsRef: true,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [5, 10],
       durationDefault: 5,
       ratioParam: "none",
       ratios: [],
@@ -450,10 +414,10 @@ export const VIDEO_MODELS: ModelDef[] = [
     id: "bytedance/dreamina-v3.0/image-to-video-1080p",
     name: "Dreamina v3 1080p",
     provider: "ByteDance",
-    credits: 72,          // $6.00 × 12 = 72
-    wavespeedCost: 6.00,
-    badge: "🔥 1080p",
-    description: "Full HD cinematográfico",
+    credits: 9,               // $0.60 × 15 = 9.0 → 9
+    wavespeedCost: 0.60,
+    badge: "1080p",
+    description: "Full HD cinematografico",
     supportsRef: true,
     constraints: {
       durationMode: "discrete",
@@ -465,18 +429,96 @@ export const VIDEO_MODELS: ModelDef[] = [
       inputType: "image",
     },
   },
+  // ── Tier 3: Premium (10+ cr) ──
+  {
+    id: "wavespeed-ai/cinematic-video-generator",
+    name: "Cinematic",
+    provider: "WaveSpeed",
+    credits: 12,              // $0.80 × 15 = 12.0 → 12
+    wavespeedCost: 0.80,
+    description: "Cinematico con audio nativo",
+    supportsRef: false,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [5, 10, 15],
+      durationDefault: 5,
+      ratioParam: "aspect_ratio",
+      ratios: STANDARD_RATIOS,
+      ratioDefault: "16:9",
+      inputType: "text",
+    },
+  },
+  {
+    id: "openai/sora-2/image-to-video",
+    name: "Sora 2",
+    provider: "OpenAI",
+    credits: 12,              // $0.80 (8s) × 15 = 12.0 → 12
+    wavespeedCost: 0.80,
+    badge: "OpenAI",
+    description: "Fisica realista, audio nativo",
+    supportsRef: true,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [4, 8, 12, 16, 20],
+      durationDefault: 8,
+      ratioParam: "none",
+      ratios: [],
+      ratioDefault: "",
+      inputType: "image",
+    },
+  },
+  {
+    id: "alibaba/wan-2.6/reference-to-video",
+    name: "WAN 2.6 Reference",
+    provider: "Alibaba",
+    credits: 15,              // $1.00 × 15 = 15.0 → 15
+    wavespeedCost: 1.00,
+    badge: "Personaje",
+    description: "Consistencia de personaje maxima",
+    supportsRef: true,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [5, 10],
+      durationDefault: 5,
+      ratioParam: "size",
+      ratios: WAN_SIZE_RATIOS,
+      ratioDefault: "16:9",
+      inputType: "videos",
+    },
+  },
+  {
+    id: "google/veo3.1/image-to-video",
+    name: "Google Veo 3.1",
+    provider: "Google",
+    credits: 24,              // $1.60 (8s no audio) × 15 = 24.0 → 24
+    wavespeedCost: 1.60,
+    badge: "Nuevo",
+    description: "Veo 3.1: alta calidad Google, Start+End",
+    supportsRef: true,
+    constraints: {
+      durationMode: "discrete",
+      durationOptions: [4, 6, 8],
+      durationDefault: 8,
+      ratioParam: "aspect_ratio",
+      ratios: VEO_RATIOS,
+      ratioDefault: "16:9",
+      inputType: "image",
+      supportsEndFrame: true,
+      endFrameParam: "last_image",
+    },
+  },
   {
     id: "openai/sora-2-pro/image-to-video",
     name: "Sora 2 Pro",
     provider: "OpenAI",
-    credits: 144,         // $12.00 × 12 = 144
-    wavespeedCost: 12.00,
-    badge: "🏆 Top",
-    description: "La mejor calidad disponible",
+    credits: 36,              // $2.40 (8s 720p) × 15 = 36.0 → 36
+    wavespeedCost: 2.40,
+    badge: "Top",
+    description: "Maxima calidad disponible",
     supportsRef: true,
     constraints: {
       durationMode: "discrete",
-      durationOptions: [4, 8, 12],
+      durationOptions: [4, 8, 12, 16, 20],
       durationDefault: 8,
       ratioParam: "none",
       ratios: [],
@@ -493,4 +535,4 @@ export const getModel = (id: string) => getImageModel(id) || getVideoModel(id);
 
 // Default models
 export const DEFAULT_IMAGE_MODEL = IMAGE_MODELS[3]; // Dreamina v3
-export const DEFAULT_VIDEO_MODEL = VIDEO_MODELS[7]; // Seedance 1.5 Pro
+export const DEFAULT_VIDEO_MODEL = VIDEO_MODELS[2]; // Seedance 1.5 Pro

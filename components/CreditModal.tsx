@@ -25,27 +25,27 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
 
         {/* Drag handle (mobile) */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
-          <div className="w-8 h-1 rounded-full bg-white/12" />
+          <div className="w-10 h-1 rounded-full bg-white/15" />
         </div>
 
         {/* Header */}
-        <div className="flex items-start justify-between px-6 pt-5 pb-4 sm:pt-6">
+        <div className="flex items-start justify-between px-6 pt-6 pb-5 sm:pt-7">
           <div>
-            <h2 className="text-white text-lg font-semibold tracking-[-0.01em]">Recargar creditos</h2>
-            <p className="text-white/30 text-xs mt-1">
+            <h2 className="text-white text-xl font-bold tracking-[-0.02em]">Recargar creditos</h2>
+            <p className="text-white/40 text-sm mt-1.5">
               1 credito ~ $0.10 &middot; No expiran
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-lg bg-white/[0.05] hover:bg-white/[0.08] flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] flex items-center justify-center transition-colors"
           >
-            <X className="w-3.5 h-3.5 text-white/40" />
+            <X className="w-4 h-4 text-white/50" />
           </button>
         </div>
 
         {/* Packs */}
-        <div className="px-6 pb-4 grid grid-cols-3 gap-2">
+        <div className="px-6 pb-5 grid grid-cols-3 gap-2.5">
           {CREDIT_PACKS.map((pack, i) => {
             const Icon = packIcons[i];
             const isPopular = pack.popular;
@@ -53,8 +53,8 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
             const styleMap = [
               {
                 card: "border-white/[0.06] bg-white/[0.02]",
-                icon: "text-white/35 bg-white/[0.05]",
-                button: "bg-white/[0.06] hover:bg-white/[0.1] text-white/60 hover:text-white border border-white/[0.06]",
+                icon: "text-white/40 bg-white/[0.06]",
+                button: "bg-white/[0.07] hover:bg-white/[0.12] text-white/70 hover:text-white border border-white/[0.08]",
               },
               {
                 card: "border-violet-500/15 bg-violet-500/[0.05]",
@@ -74,40 +74,40 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
               <div
                 key={pack.id}
                 className={cn(
-                  "relative rounded-xl border p-3.5 flex flex-col gap-3 transition-all duration-200",
+                  "relative rounded-xl border p-4 flex flex-col gap-3.5 transition-all duration-200",
                   s.card,
                   isPopular && "ring-1 ring-fuchsia-500/20"
                 )}
               >
                 {isPopular && (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full tracking-wide uppercase">
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full tracking-wide uppercase">
                     Popular
                   </div>
                 )}
 
-                <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", s.icon)}>
-                  <Icon className="w-3.5 h-3.5" />
+                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", s.icon)}>
+                  <Icon className="w-4 h-4" />
                 </div>
 
                 <div>
-                  <p className="text-white/45 text-[11px] font-medium mb-1">{pack.name}</p>
+                  <p className="text-white/50 text-xs font-medium mb-1.5">{pack.name}</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-bold tabular-nums text-white">{pack.credits}</span>
-                    <span className="text-white/25 text-[10px]">cr</span>
+                    <span className="text-2xl font-bold tabular-nums text-white">{pack.credits}</span>
+                    <span className="text-white/30 text-xs">cr</span>
                   </div>
                   {pack.bonus && (
-                    <p className="text-[10px] text-violet-400/70 mt-0.5 font-medium">{pack.bonus}</p>
+                    <p className="text-xs text-violet-400/70 mt-1 font-medium">{pack.bonus}</p>
                   )}
                 </div>
 
-                <div className="mt-auto space-y-2">
-                  <p className="text-white/35 text-xs font-semibold">${pack.price}</p>
+                <div className="mt-auto space-y-2.5">
+                  <p className="text-white/45 text-sm font-bold">${pack.price}</p>
                   <a
                     href={SKOOL_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "flex items-center justify-center gap-1 w-full text-center text-[11px] font-semibold py-2 rounded-lg transition-all duration-200",
+                      "flex items-center justify-center gap-1 w-full text-center text-xs font-semibold py-2.5 rounded-lg transition-all duration-200",
                       s.button
                     )}
                   >
@@ -120,15 +120,15 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
         </div>
 
         {/* How to buy */}
-        <div className="mx-6 mb-6 bg-violet-500/[0.05] border border-violet-500/10 rounded-xl px-4 py-3">
-          <div className="flex items-center gap-1.5 mb-1.5">
-            <ExternalLink className="w-3 h-3 text-violet-400/60" />
-            <p className="text-violet-300/70 text-xs font-medium">Como comprar?</p>
+        <div className="mx-6 mb-6 bg-violet-500/[0.05] border border-violet-500/10 rounded-xl px-5 py-4">
+          <div className="flex items-center gap-2 mb-2">
+            <ExternalLink className="w-3.5 h-3.5 text-violet-400/60" />
+            <p className="text-violet-300/80 text-sm font-medium">Como comprar?</p>
           </div>
-          <p className="text-white/35 text-xs leading-relaxed">
+          <p className="text-white/40 text-sm leading-relaxed">
             Haz click en &quot;Pedir&quot;, escribeme en Skool con el pack que quieres y tu email, y anado los creditos en minutos.
           </p>
-          <p className="text-white/20 text-[11px] mt-1.5">
+          <p className="text-white/25 text-xs mt-2">
             PayPal &middot; Pronto disponible con tarjeta
           </p>
         </div>

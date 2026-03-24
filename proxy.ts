@@ -1,0 +1,19 @@
+/**
+ * proxy.ts — Sin autenticación (modo desarrollo)
+ *
+ * Cuando tengas las keys de Clerk en .env.local, reemplaza este archivo
+ * con el contenido de proxy.clerk.ts para activar el login obligatorio.
+ */
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export default function proxy(_req: NextRequest) {
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    "/(api|trpc)(.*)",
+  ],
+};

@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import {
   ImageIcon, Film, Sparkles, Loader2,
-  Upload, X, ChevronDown, Zap, Settings2,
+  Upload, X, ChevronDown, Zap, Settings2, Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCredits } from "@/hooks/useCredits";
@@ -19,9 +19,18 @@ const IMAGE_RATIOS = ["1:1", "16:9", "9:16", "4:3", "3:2", "2:3"];
 interface BottomBarProps {
   onAddResult: (result: GenerationResult) => void;
   onUpdateResult: (id: string, updates: Partial<GenerationResult>) => void;
+  injectedPrompt?: { prompt: string; mode: Mode } | null;
+  onInjectedPromptConsumed?: () => void;
+  onOpenTemplates?: () => void;
 }
 
-export default function BottomBar({ onAddResult, onUpdateResult }: BottomBarProps) {
+export default function BottomBar({
+  onAddResult,
+  onUpdateResult,
+  injectedPrompt,
+  onInjectedPromptConsumed,
+  onOpenTemplates,
+}: BottomBarProps) {
   const [mode, setMode] = useState<Mode>("image");
   const [prompt, setPrompt] = useState("");
   const [refImage, setRefImage] = useState<string | null>(null);
@@ -74,6 +83,14 @@ export default function BottomBar({ onAddResult, onUpdateResult }: BottomBarProp
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoModel]);
+
+  // ── Consume injected prompt (from re-generate or templates) ───
+  useEffect(() => {
+    if (!injectedPrompt) return;
+    setPrompt(injectedPrompt.prompt);
+    setMode(injectedPrompt.mode);
+    onInjectedPromptConsumed?.();
+  }, [injectedPrompt, onInjectedPromptConsumed]);
 
   // ── File handling ─────────────────────────────────────────────
   const handleFile = useCallback((file: File) => {
@@ -172,6 +189,10 @@ export default function BottomBar({ onAddResult, onUpdateResult }: BottomBarProp
       status: "pending",
       statusText: "Iniciando...",
       createdAt: Date.now(),
+      modelName: currentModel.name,
+      credits: currentCredits,
+      ratio: mode === "image" ? imageRatio : videoRatio,
+      duration: mode === "video" ? videoDuration : undefined,
     });
 
     try {
@@ -539,6 +560,20 @@ export default function BottomBar({ onAddResult, onUpdateResult }: BottomBarProp
 
                 <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-200", showSettings && "rotate-180")} />
               </button>
+
+              {onOpenTemplates && (
+                <>
+                  <span className="text-white/[0.08]">|</span>
+                  <button
+                    onClick={onOpenTemplates}
+                    className="flex items-center gap-1.5 text-sm text-white/25 hover:text-violet-400/70 transition-colors duration-200"
+                    title="Plantillas de prompts"
+                  >
+                    <Wand2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Plantillas</span>
+                  </button>
+                </>
+              )}
 
               <span className="ml-auto text-xs text-white/15 hidden sm:block font-mono">Cmd+Return</span>
             </div>

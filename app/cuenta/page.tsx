@@ -1,15 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { Zap, ArrowLeft, Crown, ImageIcon, Film } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Zap, ArrowLeft, Crown, ImageIcon, Film, TrendingUp, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useCredits } from "@/hooks/useCredits";
 import { formatCredits, CREDIT_PACKS } from "@/lib/credits";
+import { loadStats } from "@/lib/storage";
+import type { GenerationStats } from "@/lib/types";
 import CreditModal from "@/components/CreditModal";
 
 export default function CuentaPage() {
   const { credits, loading } = useCredits();
   const [showModal, setShowModal] = useState(false);
+  const [stats, setStats] = useState<GenerationStats | null>(null);
+
+  useEffect(() => {
+    setStats(loadStats());
+  }, []);
+
+  const totalGenerations = (stats?.totalImages ?? 0) + (stats?.totalVideos ?? 0);
 
   return (
     <>
@@ -61,15 +70,55 @@ export default function CuentaPage() {
             </div>
           </div>
 
+          {/* Stats card */}
+          <div className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-7 mb-5">
+            <div className="flex items-center gap-2.5 mb-5">
+              <TrendingUp className="w-5 h-5 text-violet-400/60" />
+              <h2 className="text-white font-bold text-base">Tus estadisticas</h2>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-white tabular-nums">{totalGenerations}</div>
+                <div className="text-xs text-white/35 mt-1">Total generadas</div>
+              </div>
+              <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <ImageIcon className="w-4 h-4 text-violet-400/60" />
+                  <span className="text-2xl font-bold text-white tabular-nums">{stats?.totalImages ?? 0}</span>
+                </div>
+                <div className="text-xs text-white/35 mt-1">Imagenes</div>
+              </div>
+              <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Film className="w-4 h-4 text-fuchsia-400/60" />
+                  <span className="text-2xl font-bold text-white tabular-nums">{stats?.totalVideos ?? 0}</span>
+                </div>
+                <div className="text-xs text-white/35 mt-1">Videos</div>
+              </div>
+              <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-4 text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Zap className="w-4 h-4 text-yellow-400/60" />
+                  <span className="text-2xl font-bold text-white tabular-nums">{stats?.totalCreditsSpent ?? 0}</span>
+                </div>
+                <div className="text-xs text-white/35 mt-1">Creditos usados</div>
+              </div>
+            </div>
+          </div>
+
           {/* What you can create */}
           <div className="bg-[#0c0c10] border border-white/[0.07] rounded-2xl p-7 mb-5">
-            <h2 className="text-white font-bold text-base mb-5">Que puedes crear?</h2>
+            <div className="flex items-center gap-2.5 mb-5">
+              <Sparkles className="w-5 h-5 text-violet-400/60" />
+              <h2 className="text-white font-bold text-base">Que puedes crear?</h2>
+            </div>
             <div className="space-y-1">
               {[
                 { icon: ImageIcon, label: "Imagen basica (Dreamina v3)", cost: 4 },
                 { icon: ImageIcon, label: "Imagen premium (DALL-E 3)", cost: 5 },
-                { icon: Film, label: "Video basico (Cinematic)", cost: 12 },
-                { icon: Film, label: "Video pro (Seedance 1.5 Pro)", cost: 3 },
+                { icon: Film, label: "Video rapido (Seedance Fast)", cost: 3 },
+                { icon: Film, label: "Video premium (Kling 3.0 Pro)", cost: 9 },
+                { icon: Film, label: "Video ultra (Google Veo 3.1)", cost: 24 },
               ].map(({ icon: Icon, label, cost }) => (
                 <div key={label} className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
                   <div className="flex items-center gap-2.5 text-white/55 text-sm">

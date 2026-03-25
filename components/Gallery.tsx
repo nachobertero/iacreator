@@ -1,23 +1,129 @@
 "use client";
 
-import { Download, ImageIcon, Film, Loader2, AlertCircle, Sparkles } from "lucide-react";
+import { useState } from "react";
+import {
+  Download, ImageIcon, Film, Loader2, AlertCircle, Sparkles,
+  Heart, Search, Filter, Trash2, Wand2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { GenerationResult } from "@/lib/types";
+import type { GenerationResult, GalleryFilter } from "@/lib/types";
 
 interface GalleryProps {
   results: GenerationResult[];
+  onClickItem: (item: GenerationResult) => void;
+  onToggleFavorite: (id: string) => void;
+  onOpenTemplates: () => void;
 }
 
-export default function Gallery({ results }: GalleryProps) {
+const FILTER_OPTIONS: { id: GalleryFilter; label: string }[] = [
+  { id: "all", label: "Todo" },
+  { id: "images", label: "Imagenes" },
+  { id: "videos", label: "Videos" },
+  { id: "favorites", label: "Favoritos" },
+];
+
+export default function Gallery({ results, onClickItem, onToggleFavorite, onOpenTemplates }: GalleryProps) {
+  const [filter, setFilter] = useState<GalleryFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+
   if (results.length === 0) {
-    return <EmptyState />;
+    return <EmptyState onOpenTemplates={onOpenTemplates} />;
   }
 
+  // Apply filters
+  let filtered = results;
+  if (filter === "images") filtered = filtered.filter((r) => r.type === "image");
+  if (filter === "videos") filtered = filtered.filter((r) => r.type === "video");
+  if (filter === "favorites") filtered = filtered.filter((r) => r.favorite);
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter((r) => r.prompt.toLowerCase().includes(q));
+  }
+
+  const completedCount = results.filter((r) => r.status === "completed").length;
+  const favCount = results.filter((r) => r.favorite).length;
+
   return (
-    <div className="px-4 sm:px-6 pt-6">
+    <div className="px-4 sm:px-6 pt-5">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between mb-5 gap-3">
+        {/* Filter tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          {FILTER_OPTIONS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all border",
+                filter === f.id
+                  ? "bg-violet-500/15 border-violet-500/30 text-white"
+                  : "bg-white/[0.03] border-white/[0.06] text-white/35 hover:text-white/55 hover:bg-white/[0.05]"
+              )}
+            >
+              {f.label}
+              {f.id === "favorites" && favCount > 0 && (
+                <span className="ml-1.5 text-xs text-pink-400/60">{favCount}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Right side: count + search toggle */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs text-white/20 hidden sm:block">
+            {completedCount} creacion{completedCount !== 1 ? "es" : ""}
+          </span>
+
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className={cn(
+              "w-9 h-9 rounded-lg flex items-center justify-center transition-all border",
+              showSearch
+                ? "bg-violet-500/15 border-violet-500/30 text-violet-400"
+                : "bg-white/[0.03] border-white/[0.06] text-white/30 hover:text-white/50"
+            )}
+          >
+            <Search className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Search bar */}
+      {showSearch && (
+        <div className="mb-4 animate-fade-in">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar por prompt..."
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/30"
+              autoFocus
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Empty filter state */}
+      {filtered.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <Filter className="w-8 h-8 text-white/15 mb-3" />
+          <p className="text-white/35 text-sm">No hay resultados con este filtro</p>
+        </div>
+      )}
+
+      {/* Masonry grid */}
       <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3.5 space-y-3.5">
-        {results.map((item, i) => (
-          <GalleryCard key={item.id} item={item} index={i} />
+        {filtered.map((item, i) => (
+          <GalleryCard
+            key={item.id}
+            item={item}
+            index={i}
+            onClick={() => item.status === "completed" && onClickItem(item)}
+            onToggleFavorite={() => onToggleFavorite(item.id)}
+          />
         ))}
       </div>
     </div>
@@ -25,7 +131,7 @@ export default function Gallery({ results }: GalleryProps) {
 }
 
 // ── Empty state ──────────────────────────────────────────────────
-function EmptyState() {
+function EmptyState({ onOpenTemplates }: { onOpenTemplates: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center h-full min-h-[65vh] px-6 select-none">
       {/* Animated icon */}
@@ -43,6 +149,17 @@ function EmptyState() {
         <p className="text-white/35 text-base max-w-md leading-relaxed">
           Escribe un prompt abajo para generar tu primera imagen o video con inteligencia artificial
         </p>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex items-center gap-3 mb-8">
+        <button
+          onClick={onOpenTemplates}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-violet-600/15 border border-violet-500/25 text-violet-300 text-sm font-medium hover:bg-violet-600/25 transition-all"
+        >
+          <Wand2 className="w-4 h-4" />
+          Ver plantillas
+        </button>
       </div>
 
       {/* Mode hints */}
@@ -64,14 +181,30 @@ function EmptyState() {
 }
 
 // ── Gallery card ────────────────────────────────────────────────
-function GalleryCard({ item, index }: { item: GenerationResult; index: number }) {
-  const handleDownload = () => {
+function GalleryCard({
+  item,
+  index,
+  onClick,
+  onToggleFavorite,
+}: {
+  item: GenerationResult;
+  index: number;
+  onClick: () => void;
+  onToggleFavorite: () => void;
+}) {
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!item.url) return;
     const a = document.createElement("a");
     a.href = item.url;
     a.download = `ai-creator-${item.id}.${item.type === "video" ? "mp4" : "jpg"}`;
     a.target = "_blank";
     a.click();
+  };
+
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFavorite();
   };
 
   // ── Loading state ─────────────────────────────────────────────
@@ -83,21 +216,17 @@ function GalleryCard({ item, index }: { item: GenerationResult; index: number })
       >
         <div className="relative h-52 overflow-hidden bg-gradient-to-br from-violet-950/40 to-fuchsia-950/20">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-shimmer" />
-
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/15 flex items-center justify-center">
-                {item.type === "video" ? (
-                  <Film className="w-5 h-5 text-violet-400/40" />
-                ) : (
-                  <ImageIcon className="w-5 h-5 text-violet-400/40" />
-                )}
-              </div>
+            <div className="w-12 h-12 rounded-xl bg-violet-500/10 border border-violet-500/15 flex items-center justify-center">
+              {item.type === "video" ? (
+                <Film className="w-5 h-5 text-violet-400/40" />
+              ) : (
+                <ImageIcon className="w-5 h-5 text-violet-400/40" />
+              )}
             </div>
             <Loader2 className="w-5 h-5 text-violet-400/30 animate-spin" />
           </div>
         </div>
-
         <div className="px-3.5 py-3 border-t border-white/[0.04]">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="w-2 h-2 rounded-full bg-violet-400/50 animate-pulse shrink-0" />
@@ -133,7 +262,8 @@ function GalleryCard({ item, index }: { item: GenerationResult; index: number })
   // ── Completed state ───────────────────────────────────────────
   return (
     <div
-      className="break-inside-avoid rounded-xl overflow-hidden group relative bg-[#0c0c10] border border-white/[0.05] hover:border-white/[0.12] transition-all duration-300 animate-fade-up"
+      onClick={onClick}
+      className="break-inside-avoid rounded-xl overflow-hidden group relative bg-[#0c0c10] border border-white/[0.05] hover:border-white/[0.12] transition-all duration-300 animate-fade-up cursor-pointer"
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       {item.type === "image" ? (
@@ -159,6 +289,13 @@ function GalleryCard({ item, index }: { item: GenerationResult; index: number })
         />
       )}
 
+      {/* Favorite indicator (always visible if favorited) */}
+      {item.favorite && (
+        <div className="absolute top-2.5 right-2.5 z-10">
+          <Heart className="w-4 h-4 text-pink-400 fill-current drop-shadow-lg" />
+        </div>
+      )}
+
       {/* Hover overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
         {/* Top badges */}
@@ -170,12 +307,26 @@ function GalleryCard({ item, index }: { item: GenerationResult; index: number })
               <><ImageIcon className="w-3.5 h-3.5" />Imagen</>
             )}
           </span>
-          <button
-            onClick={handleDownload}
-            className="w-8 h-8 bg-black/50 backdrop-blur-md hover:bg-violet-600 text-white/70 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200 border border-white/[0.08] hover:border-violet-500/50"
-          >
-            <Download className="w-4 h-4" />
-          </button>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={handleFavorite}
+              className={cn(
+                "w-8 h-8 bg-black/50 backdrop-blur-md rounded-lg flex items-center justify-center transition-all duration-200 border border-white/[0.08]",
+                item.favorite
+                  ? "text-pink-400 hover:text-pink-300"
+                  : "text-white/50 hover:text-pink-400"
+              )}
+            >
+              <Heart className={cn("w-4 h-4", item.favorite && "fill-current")} />
+            </button>
+            <button
+              onClick={handleDownload}
+              className="w-8 h-8 bg-black/50 backdrop-blur-md hover:bg-violet-600 text-white/70 hover:text-white rounded-lg flex items-center justify-center transition-all duration-200 border border-white/[0.08] hover:border-violet-500/50"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Bottom prompt */}

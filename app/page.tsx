@@ -6,20 +6,10 @@ import BottomBar from "@/components/BottomBar";
 import Lightbox from "@/components/Lightbox";
 import PromptTemplates from "@/components/PromptTemplates";
 import { useGallery } from "@/hooks/useGallery";
-import { usePreviewGeneration } from "@/hooks/usePreviewGeneration";
 import type { GenerationResult, Mode } from "@/lib/types";
 
 export default function Home() {
-  const {
-    results,
-    addResult,
-    updateResult,
-    toggleFavorite,
-    deleteResult,
-  } = useGallery();
-
-  // Pre-generates all template previews in background on first load
-  const { previewCache, pendingCount } = usePreviewGeneration();
+  const { results, addResult, updateResult, toggleFavorite, deleteResult } = useGallery();
 
   const [lightboxItem, setLightboxItem] = useState<GenerationResult | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -34,7 +24,6 @@ export default function Home() {
     setInjectedPrompt({ prompt, mode });
   }, []);
 
-  // Keep lightbox item in sync with latest results state
   const currentLightboxItem = lightboxItem
     ? results.find((r) => r.id === lightboxItem.id) ?? lightboxItem
     : null;
@@ -70,8 +59,6 @@ export default function Home() {
         open={showTemplates}
         onClose={() => setShowTemplates(false)}
         onSelect={handleSelectTemplate}
-        previewCache={previewCache}
-        pendingCount={pendingCount}
       />
     </main>
   );

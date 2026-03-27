@@ -30,7 +30,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col" style={{ height: "calc(100vh - 64px)" }}>
-      <div className="flex-1 overflow-y-auto pb-52">
+      <div className="flex-1 overflow-y-auto pb-64">
         <Gallery
           results={results}
           onClickItem={setLightboxItem}

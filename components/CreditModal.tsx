@@ -32,7 +32,7 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
         <div className="flex items-start justify-between px-6 pt-6 pb-5 sm:pt-7">
           <div>
             <h2 className="text-white text-xl font-bold tracking-[-0.02em]">Recargar creditos</h2>
-            <p className="text-white/40 text-sm mt-1.5">
+            <p className="text-white/50 text-sm mt-1.5">
               1 credito ~ $0.10 &middot; No expiran
             </p>
           </div>
@@ -90,7 +90,7 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
                 </div>
 
                 <div>
-                  <p className="text-white/50 text-xs font-medium mb-1.5">{pack.name}</p>
+                  <p className="text-white/60 text-xs font-semibold mb-1.5 uppercase tracking-wider">{pack.name}</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-bold tabular-nums text-white">{pack.credits}</span>
                     <span className="text-white/30 text-xs">cr</span>
@@ -101,7 +101,7 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
                 </div>
 
                 <div className="mt-auto space-y-2.5">
-                  <p className="text-white/45 text-sm font-bold">${pack.price}</p>
+                  <p className="text-white/70 text-base font-bold">${pack.price}</p>
                   <a
                     href={SKOOL_URL}
                     target="_blank"
@@ -125,10 +125,10 @@ export default function CreditModal({ open, onClose }: CreditModalProps) {
             <ExternalLink className="w-3.5 h-3.5 text-violet-400/60" />
             <p className="text-violet-300/80 text-sm font-medium">Como comprar?</p>
           </div>
-          <p className="text-white/40 text-sm leading-relaxed">
+          <p className="text-white/55 text-sm leading-relaxed">
             Haz click en &quot;Pedir&quot;, escribeme en Skool con el pack que quieres y tu email, y anado los creditos en minutos.
           </p>
-          <p className="text-white/25 text-xs mt-2">
+          <p className="text-white/35 text-xs mt-2">
             PayPal &middot; Pronto disponible con tarjeta
           </p>
         </div>

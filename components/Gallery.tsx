@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   Download, ImageIcon, Film, Loader2, AlertCircle, Sparkles,
-  Heart, Search, Filter, Trash2, Wand2,
+  Heart, Search, Filter, Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GenerationResult, GalleryFilter } from "@/lib/types";
@@ -27,11 +27,7 @@ export default function Gallery({ results, onClickItem, onToggleFavorite, onOpen
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
 
-  if (results.length === 0) {
-    return <EmptyState onOpenTemplates={onOpenTemplates} />;
-  }
-
-  // Apply filters
+  // Apply filters (also used when empty to show empty state consistently)
   let filtered = results;
   if (filter === "images") filtered = filtered.filter((r) => r.type === "image");
   if (filter === "videos") filtered = filtered.filter((r) => r.type === "video");
@@ -39,6 +35,10 @@ export default function Gallery({ results, onClickItem, onToggleFavorite, onOpen
   if (searchQuery.trim()) {
     const q = searchQuery.toLowerCase();
     filtered = filtered.filter((r) => r.prompt.toLowerCase().includes(q));
+  }
+
+  if (results.length === 0) {
+    return <EmptyState onOpenTemplates={onOpenTemplates} />;
   }
 
   const completedCount = results.filter((r) => r.status === "completed").length;
@@ -58,7 +58,7 @@ export default function Gallery({ results, onClickItem, onToggleFavorite, onOpen
                 "px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all border",
                 filter === f.id
                   ? "bg-violet-500/15 border-violet-500/30 text-white"
-                  : "bg-white/[0.03] border-white/[0.06] text-white/35 hover:text-white/55 hover:bg-white/[0.05]"
+                  : "bg-white/[0.03] border-white/[0.06] text-white/50 hover:text-white/70 hover:bg-white/[0.05]"
               )}
             >
               {f.label}
@@ -71,7 +71,7 @@ export default function Gallery({ results, onClickItem, onToggleFavorite, onOpen
 
         {/* Right side: count + search toggle */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-white/20 hidden sm:block">
+          <span className="text-xs text-white/35 hidden sm:block">
             {completedCount} creacion{completedCount !== 1 ? "es" : ""}
           </span>
 
@@ -146,7 +146,7 @@ function EmptyState({ onOpenTemplates }: { onOpenTemplates: () => void }) {
         <h2 className="text-white/90 text-2xl font-bold tracking-[-0.02em]">
           Tu estudio creativo
         </h2>
-        <p className="text-white/35 text-base max-w-md leading-relaxed">
+        <p className="text-white/50 text-base max-w-md leading-relaxed">
           Escribe un prompt abajo para generar tu primera imagen o video con inteligencia artificial
         </p>
       </div>
@@ -164,17 +164,17 @@ function EmptyState({ onOpenTemplates }: { onOpenTemplates: () => void }) {
 
       {/* Mode hints */}
       <div className="flex items-center gap-5">
-        <div className="flex items-center gap-2 text-white/25 text-sm">
+        <div className="flex items-center gap-2 text-white/40 text-sm">
           <ImageIcon className="w-4 h-4" />
           <span>Imagenes</span>
         </div>
         <div className="w-px h-4 bg-white/[0.08]" />
-        <div className="flex items-center gap-2 text-white/25 text-sm">
+        <div className="flex items-center gap-2 text-white/40 text-sm">
           <Film className="w-4 h-4" />
           <span>Videos</span>
         </div>
         <div className="w-px h-4 bg-white/[0.08]" />
-        <span className="text-white/15 text-sm font-mono">Cmd + Enter</span>
+        <span className="text-white/25 text-sm font-mono">Cmd + Enter</span>
       </div>
     </div>
   );
@@ -234,7 +234,7 @@ function GalleryCard({
               {item.statusText || "Generando..."}
             </p>
           </div>
-          <p className="text-xs text-white/30 line-clamp-1">{item.prompt}</p>
+          <p className="text-xs text-white/45 line-clamp-1">{item.prompt}</p>
         </div>
       </div>
     );
@@ -253,7 +253,7 @@ function GalleryCard({
           </p>
         </div>
         <div className="px-3.5 py-3 border-t border-white/[0.04]">
-          <p className="text-xs text-white/30 line-clamp-1">{item.prompt}</p>
+          <p className="text-xs text-white/45 line-clamp-1">{item.prompt}</p>
         </div>
       </div>
     );

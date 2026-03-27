@@ -266,7 +266,7 @@ export default function BottomBar({
 
             {/* Model grid */}
             <div className="space-y-3">
-              <p className="text-xs font-bold text-white/40 uppercase tracking-widest">Modelo</p>
+              <p className="text-xs font-bold text-white/50 uppercase tracking-widest">Modelo</p>
               <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-0.5">
                 {(mode === "image" ? IMAGE_MODELS : VIDEO_MODELS).map((m) => {
                   const isActive = (mode === "image" ? imageModel : videoModel).id === m.id;
@@ -283,7 +283,7 @@ export default function BottomBar({
                     >
                       <div className="min-w-0 pr-2">
                         <span className="font-semibold text-sm block truncate">{m.name}</span>
-                        <span className="text-xs text-white/30 block mt-0.5">{m.description}</span>
+                        <span className="text-xs text-white/40 block mt-0.5">{m.description}</span>
                         {m.badge && <span className="text-xs text-violet-400/60 mt-0.5 block">{m.badge}</span>}
                       </div>
                       <div className="flex items-center gap-1 shrink-0 mt-0.5">
@@ -302,7 +302,7 @@ export default function BottomBar({
             <div className="flex gap-8 flex-wrap">
               {showRatio && (
                 <div className="space-y-3">
-                  <p className="text-xs font-bold text-white/40 uppercase tracking-widest">Proporcion</p>
+                  <p className="text-xs font-bold text-white/50 uppercase tracking-widest">Proporcion</p>
                   <div className="flex gap-1.5 flex-wrap">
                     {(mode === "image" ? IMAGE_RATIOS : vc!.ratios.map((r) => r.label)).map((r) => (
                       <button
@@ -324,7 +324,7 @@ export default function BottomBar({
 
               {showDuration && (
                 <div className="space-y-3">
-                  <p className="text-xs font-bold text-white/40 uppercase tracking-widest">
+                  <p className="text-xs font-bold text-white/50 uppercase tracking-widest">
                     Duracion
                     {vc!.durationMode === "range" && vc!.durationRange && (
                       <span className="text-white/20 ml-1 normal-case font-normal">
@@ -464,13 +464,13 @@ export default function BottomBar({
                   "flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 border",
                   showSettings
                     ? "bg-violet-500/10 border-violet-500/25 text-violet-300"
-                    : "bg-white/[0.03] border-white/[0.07] text-white/45 hover:text-white/70 hover:bg-white/[0.05]"
+                    : "bg-white/[0.03] border-white/[0.07] text-white/55 hover:text-white/80 hover:bg-white/[0.05]"
                 )}
               >
                 <Settings2 className="w-4 h-4 shrink-0" />
                 <span className="hidden sm:inline max-w-[120px] truncate">{currentModel.name}</span>
-                {showRatio && <span className="text-white/35">{ratioLabel}</span>}
-                {mode === "video" && showDuration && <span className="text-white/35">{videoDuration}s</span>}
+                {showRatio && <span className="text-white/45">{ratioLabel}</span>}
+                {mode === "video" && showDuration && <span className="text-white/45">{videoDuration}s</span>}
                 <ChevronDown className={cn("w-3.5 h-3.5 text-white/25 transition-transform duration-200 shrink-0", showSettings && "rotate-180")} />
               </button>
 
@@ -490,7 +490,7 @@ export default function BottomBar({
               {supportsEndFrame && (
                 <button
                   onClick={() => endFrameFileRef.current?.click()}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-white/[0.03] border border-white/[0.07] text-fuchsia-400/50 hover:text-fuchsia-400/80 hover:bg-white/[0.05] transition-all duration-150"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-white/[0.03] border border-white/[0.07] text-fuchsia-400/60 hover:text-fuchsia-400/90 hover:bg-white/[0.05] transition-all duration-150"
                   title="End frame"
                 >
                   <Upload className="w-4 h-4 shrink-0" />
@@ -518,8 +518,8 @@ export default function BottomBar({
                 "flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shrink-0 border",
                 generateDisabled
                   ? !canAfford && prompt.trim()
-                    ? "bg-red-950/20 border-red-500/15 text-red-500/40 cursor-not-allowed"
-                    : "bg-white/[0.02] border-white/[0.06] text-white/15 cursor-not-allowed"
+                    ? "bg-red-950/20 border-red-500/15 text-red-400/50 cursor-not-allowed"
+                    : "bg-white/[0.03] border-white/[0.07] text-white/30 cursor-not-allowed"
                   : "bg-violet-600 hover:bg-violet-500 border-violet-500/30 text-white shadow-lg shadow-violet-600/20 hover:shadow-violet-500/30 active:scale-[0.97]"
               )}
             >

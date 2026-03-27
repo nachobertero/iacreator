@@ -23,10 +23,10 @@ export default function Header() {
               <div className="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="text-white font-bold text-lg tracking-[-0.02em]">
+              <span className="text-white font-bold text-xl tracking-[-0.02em]">
                 AI Creator
               </span>
-              <span className="text-[11px] font-semibold text-white/25 bg-white/[0.05] border border-white/[0.08] px-2 py-0.5 rounded-md">
+              <span className="text-[11px] font-semibold text-white/30 bg-white/[0.06] border border-white/[0.09] px-2 py-0.5 rounded-md">
                 BETA
               </span>
             </div>

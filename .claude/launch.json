@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "ai-creator",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/Users/nacho/Documents/INSTAGRAM/MIOS/CURSO AFTER EFFECTS/ACADEMIA/PROYECTOS CLAUDE/WRAPPER/ai-creator/.claude/start-dev.sh",
+      "runtimeArgs": [],
       "port": 3000
     }
   ]

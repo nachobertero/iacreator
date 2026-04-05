@@ -442,7 +442,7 @@ export default function BottomBar({
             }
             rows={2}
             suppressHydrationWarning
-            className="w-full bg-transparent text-white placeholder-white/25 resize-none focus:outline-none text-base leading-relaxed mb-3"
+            className="w-full bg-transparent text-white placeholder-white/35 resize-none focus:outline-none text-base leading-relaxed mb-3"
             style={{ minHeight: "52px", maxHeight: "140px" }}
             onInput={(e) => {
               const t = e.currentTarget;
@@ -500,13 +500,16 @@ export default function BottomBar({
 
               {/* Templates */}
               {onOpenTemplates && (
-                <button
-                  onClick={onOpenTemplates}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-white/[0.03] border border-white/[0.07] text-white/45 hover:text-violet-300/80 hover:bg-violet-500/[0.05] hover:border-violet-500/20 transition-all duration-150"
-                >
-                  <Wand2 className="w-4 h-4 shrink-0" />
-                  <span className="hidden sm:inline">Plantillas</span>
-                </button>
+                <>
+                  <div className="w-px h-4 bg-white/[0.08] mx-0.5 shrink-0" />
+                  <button
+                    onClick={onOpenTemplates}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium bg-white/[0.03] border border-white/[0.07] text-white/45 hover:text-violet-300/80 hover:bg-violet-500/[0.05] hover:border-violet-500/20 transition-all duration-150"
+                  >
+                    <Wand2 className="w-4 h-4 shrink-0" />
+                    <span className="hidden sm:inline">Plantillas</span>
+                  </button>
+                </>
               )}
             </div>
 
